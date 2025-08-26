@@ -84,7 +84,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
     };
 
     // --- ⬇️ IMPORTANT: PASTE YOUR FUNCTION URL HERE ⬇️ ---
-    const functionUrl = import.meta.env.VITE_FUNCTION_URL;
+    const functionUrl = 'https://sales-navi-feedback-api-d6aje8h6grdrf0bm.germanywestcentral-01.azurewebsites.net/api/submitFeedback?code=fwbD3oWRADwWs1d7_sqoPKD_naVvlvRC3WLaV8aEKWcYAzFu4IVdwg==';
 
     if (functionUrl === 'YOUR_AZURE_FUNCTION_URL_HERE') {
         console.error("Azure Function URL is not set. Feedback was not sent.");
