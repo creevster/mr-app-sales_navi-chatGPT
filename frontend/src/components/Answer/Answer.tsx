@@ -1,27 +1,27 @@
 // Imports remain the same
-import { FormEvent, useContext, useEffect, useMemo, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Checkbox, DefaultButton, Dialog, FontIcon, Stack, Text } from '@fluentui/react'
-import { useBoolean } from '@fluentui/react-hooks'
-import { ThumbDislike20Filled, ThumbLike20Filled } from '@fluentui/react-icons'
-import DOMPurify from 'dompurify'
-import remarkGfm from 'remark-gfm'
-import supersub from 'remark-supersub'
-import { AskResponse, Citation, Feedback, historyMessageFeedback } from '../../api'
-import { XSSAllowTags, XSSAllowAttributes } from '../../constants/sanatizeAllowables'
-import { AppStateContext } from '../../state/AppProvider'
-import { parseAnswer } from './AnswerParser'
-import styles from './Answer.module.css'
+ import { FormEvent, useContext, useEffect, useMemo, useState } from 'react'
+ import ReactMarkdown from 'react-markdown'
+ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+ import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism'
+ import { Checkbox, DefaultButton, Dialog, FontIcon, Stack, Text } from '@fluentui/react'
+ import { useBoolean } from '@fluentui/react-hooks'
+ import { ThumbDislike20Filled, ThumbLike20Filled } from '@fluentui/react-icons'
+ import DOMPurify from 'dompurify'
+ import remarkGfm from 'remark-gfm'
+ import supersub from 'remark-supersub'
+ import { AskResponse, Citation, Feedback, historyMessageFeedback } from '../../api'
+ import { XSSAllowTags, XSSAllowAttributes } from '../../constants/sanatizeAllowables'
+ import { AppStateContext } from '../../state/AppProvider'
+ import { parseAnswer } from './AnswerParser'
+ import styles from './Answer.module.css'
 
-interface Props {
+ interface Props {
   answer: AskResponse
   onCitationClicked: (citedDocument: Citation) => void
   onExectResultClicked: (answerId: string) => void
-}
+ }
 
-export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Props) => {
+ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Props) => {
   const initializeAnswerFeedback = (answer: AskResponse) => {
     if (answer.message_id == undefined) return undefined
     if (answer.feedback == undefined) return undefined
@@ -74,7 +74,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   // =================================================================
   async function sendFeedbackToAzureFunction(feedbackType: 'up' | 'down') {
     // This component already has the question and answer from its props!
-    const userQuestion = answer.question;
+    const userQuestion = parsedAnswer?.question; // <--- FIX: Changed answer.question to parsedAnswer.question
     const modelAnswer = parsedAnswer?.markdownFormatText;
 
     const feedbackData = {
@@ -86,10 +86,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
     // --- ⬇️ IMPORTANT: PASTE YOUR FUNCTION URL HERE ⬇️ ---
     const functionUrl = 'https://sales-navi-feedback-api-d6aje8h6grdrf0bm.germanywestcentral-01.azurewebsites.net/api/submitFeedback?code=fwbD3oWRADwWs1d7_sqoPKD_naVvlvRC3WLaV8aEKWcYAzFu4IVdwg==';
 
-    if (functionUrl === 'YOUR_AZURE_FUNCTION_URL_HERE') {
-        console.error("Azure Function URL is not set. Feedback was not sent.");
-        return;
-    }
+    // <--- FIX: Removed the unnecessary 'if' statement block that was here
 
     try {
         const response = await fetch(functionUrl, {
@@ -179,33 +176,33 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
   // The rest of your file remains the same...
   const updateFeedbackList = (ev?: FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
-    if (answer.message_id == undefined) return
-    const selectedFeedback = (ev?.target as HTMLInputElement)?.id as Feedback
+    if (answer.message_id == undefined) return
+    const selectedFeedback = (ev?.target as HTMLInputElement)?.id as Feedback
 
-    let feedbackList = negativeFeedbackList.slice()
-    if (checked) {
-      feedbackList.push(selectedFeedback)
-    } else {
-      feedbackList = feedbackList.filter(f => f !== selectedFeedback)
-    }
+    let feedbackList = negativeFeedbackList.slice()
+    if (checked) {
+      feedbackList.push(selectedFeedback)
+    } else {
+      feedbackList = feedbackList.filter(f => f !== selectedFeedback)
+    }
 
-    setNegativeFeedbackList(feedbackList)
-  }
+    setNegativeFeedbackList(feedbackList)
+  }
 
-  const onSubmitNegativeFeedback = async () => {
-    if (answer.message_id == undefined) return
-    await historyMessageFeedback(answer.message_id, negativeFeedbackList.join(','))
-    resetFeedbackDialog()
-  }
+  const onSubmitNegativeFeedback = async () => {
+    if (answer.message_id == undefined) return
+    await historyMessageFeedback(answer.message_id, negativeFeedbackList.join(','))
+    resetFeedbackDialog()
+  }
 
-  const resetFeedbackDialog = () => {
-    setIsFeedbackDialogOpen(false)
-    setShowReportInappropriateFeedback(false)
-    setNegativeFeedbackList([])
-  }
+  const resetFeedbackDialog = () => {
+    setIsFeedbackDialogOpen(false)
+    setShowReportInappropriateFeedback(false)
+    setNegativeFeedbackList([])
+  }
 
-  const UnhelpfulFeedbackContent = () => { /* ... code unchanged ... */ return ( <></> )}
-  const ReportInappropriateFeedbackContent = () => { /* ... code unchanged ... */ return ( <></> )}
+  const UnhelpfulFeedbackContent = () => { /* ... code unchanged ... */ return ( <></> )}
+  const ReportInappropriateFeedbackContent = () => { /* ... code unchanged ... */ return ( <></> )}
 
   const components = {
     code({ node, ...props }: { node: any; [key: string]: any }) {
@@ -394,4 +391,4 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
       </Dialog>
     </>
   )
-}
+ }
