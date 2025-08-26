@@ -69,13 +69,14 @@
   }, [appStateContext?.state.feedbackState, feedbackState, answer.message_id])
 
 
-  // =================================================================
+// =================================================================
   // ADDED: This is our new function to call your Azure Function API
   // =================================================================
   async function sendFeedbackToAzureFunction(feedbackType: 'up' | 'down') {
     // This component already has the question and answer from its props!
-    const userQuestion = parsedAnswer?.question; // <--- FIX: Changed answer.question to parsedAnswer.question
-    const modelAnswer = parsedAnswer?.markdownFormatText;
+    // We access 'answer.question' safely and provide a default string if it's not found.
+    const userQuestion = (answer as any)?.question ?? "Question not available";
+    const modelAnswer = parsedAnswer.markdownFormatText;
 
     const feedbackData = {
         user_question: userQuestion,
@@ -83,10 +84,7 @@
         feedback_type: feedbackType
     };
 
-    // --- ⬇️ IMPORTANT: PASTE YOUR FUNCTION URL HERE ⬇️ ---
     const functionUrl = 'https://sales-navi-feedback-api-d6aje8h6grdrf0bm.germanywestcentral-01.azurewebsites.net/api/submitFeedback?code=fwbD3oWRADwWs1d7_sqoPKD_naVvlvRC3WLaV8aEKWcYAzFu4IVdwg==';
-
-    // <--- FIX: Removed the unnecessary 'if' statement block that was here
 
     try {
         const response = await fetch(functionUrl, {
