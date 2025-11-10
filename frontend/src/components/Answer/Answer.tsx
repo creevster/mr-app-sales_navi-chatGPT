@@ -2,7 +2,9 @@ import { FormEvent, useContext, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Checkbox, DefaultButton, Dialog, FontIcon, Stack, Text } from '@fluentui/react'
+// [CHANGE START] - We need to import the TextField component
+import { Checkbox, DefaultButton, Dialog, FontIcon, Stack, Text, TextField } from '@fluentui/react'
+// [CHANGE END]
 import { useBoolean } from '@fluentui/react-hooks'
 import { ThumbDislike20Filled, ThumbLike20Filled } from '@fluentui/react-icons'
 import DOMPurify from 'dompurify'
@@ -40,6 +42,11 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false)
   const [showReportInappropriateFeedback, setShowReportInappropriateFeedback] = useState(false)
   const [negativeFeedbackList, setNegativeFeedbackList] = useState<Feedback[]>([])
+  
+  // [CHANGE START] - This new state variable will hold the text from the "Other" text box
+  const [otherFeedbackText, setOtherFeedbackText] = useState('')
+  // [CHANGE END]
+
   const appStateContext = useContext(AppStateContext)
   const FEEDBACK_ENABLED =
     appStateContext?.state.frontendSettings?.feedback_enabled && appStateContext?.state.isCosmosDBAvailable?.cosmosDB
@@ -141,7 +148,22 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
   const onSubmitNegativeFeedback = async () => {
     if (answer.message_id == undefined) return
-    await historyMessageFeedback(answer.message_id, negativeFeedbackList.join(','))
+    
+    // [CHANGE START] - We modify how the feedback text is put together
+    let feedbackString = negativeFeedbackList.join(',')
+
+    // If "Other" is checked and there's text, append the text.
+    // We use " | " as a separator so it's easy to read in the database.
+    if (negativeFeedbackList.includes(Feedback.OtherUnhelpful) && otherFeedbackText.trim().length > 0) {
+      feedbackString += ` | ${otherFeedbackText}`
+    } else if (negativeFeedbackList.includes(Feedback.OtherHarmful) && otherFeedbackText.trim().length > 0) {
+      // Also check for the "Other" on the inappropriate content screen
+      feedbackString += ` | ${otherFeedbackText}`
+    }
+
+    await historyMessageFeedback(answer.message_id, feedbackString)
+    // [CHANGE END]
+
     resetFeedbackDialog()
   }
 
@@ -149,9 +171,17 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
     setIsFeedbackDialogOpen(false)
     setShowReportInappropriateFeedback(false)
     setNegativeFeedbackList([])
+    
+    // [CHANGE START] - We clear out the "Other" text field when the dialog is closed
+    setOtherFeedbackText('')
+    // [CHANGE END]
   }
 
   const UnhelpfulFeedbackContent = () => {
+    // [CHANGE START] - We check if the "Other" checkbox is ticked
+    const isOtherSelected = negativeFeedbackList.includes(Feedback.OtherUnhelpful)
+    // [CHANGE END]
+
     return (
       <>
         <div>Why wasn't this response helpful?</div>
@@ -181,6 +211,22 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
             id={Feedback.OtherUnhelpful}
             defaultChecked={negativeFeedbackList.includes(Feedback.OtherUnhelpful)}
             onChange={updateFeedbackList}></Checkbox>
+          
+          {/* [CHANGE START] - This is the new part! */}
+          {/* We only show the TextField if the "Other" checkbox is selected */}
+          {isOtherSelected && (
+            <TextField
+              label="Please provide more details"
+              multiline
+              rows={3}
+              value={otherFeedbackText}
+              // This updates our state variable every time the user types
+              onChange={(e, newValue) => setOtherFeedbackText(newValue || '')}
+              styles={{ root: { marginLeft: 28, marginTop: 8 } }} // Indent it under "Other"
+            />
+          )}
+          {/* [CHANGE END] */}
+
         </Stack>
         <div onClick={() => setShowReportInappropriateFeedback(true)} style={{ color: '#115EA3', cursor: 'pointer' }}>
           Report inappropriate content
@@ -190,6 +236,10 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   }
 
   const ReportInappropriateFeedbackContent = () => {
+    // [CHANGE START] - We do the same check for the "Other" on this screen
+    const isOtherHarmfulSelected = negativeFeedbackList.includes(Feedback.OtherHarmful)
+    // [CHANGE END]
+
     return (
       <>
         <div>
@@ -221,6 +271,20 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
             id={Feedback.OtherHarmful}
             defaultChecked={negativeFeedbackList.includes(Feedback.OtherHarmful)}
             onChange={updateFeedbackList}></Checkbox>
+          
+          {/* [CHANGE START] - Add the text field for this "Other" option too */}
+          {isOtherHarmfulSelected && (
+            <TextField
+              label="Please provide more details"
+              multiline
+              rows={3}
+              value={otherFeedbackText}
+              onChange={(e, newValue) => setOtherFeedbackText(newValue || '')}
+              styles={{ root: { marginLeft: 28, marginTop: 8 } }}
+            />
+          )}
+          {/* [CHANGE END] */}
+
         </Stack>
       </>
     )
