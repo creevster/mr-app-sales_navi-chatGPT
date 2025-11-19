@@ -39,8 +39,6 @@ interface Props {
 
 }
 
-
-
 export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Props) => {
 
   const initializeAnswerFeedback = (answer: AskResponse) => {
@@ -56,8 +54,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
     return Feedback.Neutral
 
   }
-
-
 
   const [isRefAccordionOpen, { toggle: toggleIsRefAccordionOpen }] = useBoolean(false)
 
