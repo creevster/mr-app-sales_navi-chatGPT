@@ -316,7 +316,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
           <Checkbox
 
-            label="Citations are missing"
+            label="Links are missing"
 
             id={Feedback.MissingCitation}
 
@@ -326,7 +326,7 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
           <Checkbox
 
-            label="Citations are wrong"
+            label="Links are wrong"
 
             id={Feedback.WrongCitation}
 
