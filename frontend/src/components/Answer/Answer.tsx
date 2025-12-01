@@ -59,8 +59,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
   const filePathTruncationLimit = 50
 
-
-
   const parsedAnswer = useMemo(() => parseAnswer(answer), [answer])
 
   const [chevronIsExpanded, setChevronIsExpanded] = useState(isRefAccordionOpen)
@@ -91,8 +89,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
   }
 
-
-
   useEffect(() => {
 
     setChevronIsExpanded(isRefAccordionOpen)
@@ -104,8 +100,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   useEffect(() => {
 
     if (answer.message_id == undefined) return
-
-
 
     let currentFeedbackState
 
@@ -128,8 +122,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
   const createCitationFilepath = (citation: Citation, index: number, truncate: boolean = false) => {
 
     let citationFilename = ''
-
-
 
     if (citation.filepath) {
 
@@ -161,13 +153,9 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
 
   }
 
-
-
   const onLikeResponseClicked = async () => {
 
     if (answer.message_id == undefined) return
-
-
 
     let newFeedbackState = feedbackState
 
@@ -200,8 +188,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
     await historyMessageFeedback(answer.message_id, newFeedbackState)
 
   }
-
-
 
   const onDislikeResponseClicked = async () => {
 
@@ -240,8 +226,6 @@ export const Answer = ({ answer, onCitationClicked, onExectResultClicked }: Prop
     })
 
   }
-
-
 
   const updateFeedbackList = (ev?: FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
 
