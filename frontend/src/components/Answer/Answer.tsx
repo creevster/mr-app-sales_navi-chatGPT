@@ -26,7 +26,6 @@ import { AppStateContext } from '../../state/AppProvider'
 
 import { parseAnswer } from './AnswerParser'
 
-
 import styles from './Answer.module.css'
 
 interface Props {
