@@ -27,20 +27,23 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
-      # --- 2. NEW: SETUP & BUILD NODE.JS (Frontend) ---
+      # --- 2. SETUP & BUILD FRONTEND ---
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
       - name: Install Frontend Dependencies
+        working-directory: ./frontend  # <--- I ADDED THIS FOR YOU
         run: npm install
 
       - name: Build Frontend
+        working-directory: ./frontend  # <--- I ADDED THIS FOR YOU
         run: npm run build
 
       # --- 3. PACKAGE & UPLOAD ---
       - name: Zip artifact for deployment
+        # This zips the python code AND the new 'build' folder created above
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
