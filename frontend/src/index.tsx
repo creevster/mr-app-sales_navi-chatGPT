@@ -1,9 +1,7 @@
-import { initializeIcons } from '@fluentui/react';
-initializeIcons('https://res.cdn.office.net/files/fabric-cdn-prod_20240129.001/assets/icons/');
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { HashRouter, Route, Routes } from 'react-router-dom'
-import { initializeIcons } from '@fluentui/react'
+import { initializeIcons } from '@fluentui/react' // Keep this single import
 
 import Chat from './pages/chat/Chat'
 import Layout from './pages/layout/Layout'
@@ -12,6 +10,7 @@ import { AppStateProvider } from './state/AppProvider'
 
 import './index.css'
 
+// Keep only this one call (it uses the newer Dec 2024 version)
 initializeIcons("https://res.cdn.office.net/files/fabric-cdn-prod_20241209.001/assets/icons/")
 
 export default function App() {
